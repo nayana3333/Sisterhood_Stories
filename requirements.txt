@@ -9,3 +9,4 @@ asgiref==3.8.1
 twilio==8.13.0
 gunicorn
 whitenoise
+Pillow==10.4.0
