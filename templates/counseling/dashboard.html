@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Counselor Dashboard{% endblock %}
+{% block content %}
+<h2>Counselor Dashboard</h2>
+
+{% if not profile %}
+  <div class="alert alert-warning">No psychiatrist profile found for your account. Please ask admin to create one for you in the Admin panel.</div>
+{% else %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ profile.full_name }} {% if profile.is_verified %}<span class="badge bg-success">Verified</span>{% endif %}</h5>
+      <div>License: {{ profile.license_no }}</div>
+      <div>Specialization: {{ profile.specialization|default:'—' }}</div>
+      <div>Languages: {{ profile.languages|default:'—' }}</div>
+      <div>Experience: {{ profile.years_experience }} years</div>
+      <div>Modes: {% if profile.available_chat %}Chat {% endif %}{% if profile.available_voice %}• Voice {% endif %}{% if profile.available_video %}• Video{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h5>Upcoming Slots</h5>
+      <ul class="list-group mb-3">
+        {% for s in slots %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ s.start }} → {{ s.end }}
+            <span class="badge {% if s.is_booked %}bg-secondary{% else %}bg-success{% endif %}">{% if s.is_booked %}Booked{% else %}Open{% endif %}</span>
+          </li>
+        {% empty %}
+          <li class="list-group-item">No slots yet.</li>
+        {% endfor %}
+      </ul>
+      <p class="small text-muted">Tip: Add slots in Admin → Counseling → Availability slots.</p>
+    </div>
+    <div class="col-md-6">
+      <h5>Recent Bookings</h5>
+      <ul class="list-group mb-3">
+        {% for b in bookings %}
+          <li class="list-group-item">
+            <div><strong>{{ b.user.username }}</strong> — {{ b.mode|title }} — <span class="badge bg-info text-dark">{{ b.status }}</span></div>
+            <div class="small text-muted">{{ b.slot.start }} → {{ b.slot.end }}</div>
+            {% if b.allow_anonymous and b.pseudonym %}
+              <div class="small">Pseudonym: {{ b.pseudonym }}</div>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="list-group-item">No bookings yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

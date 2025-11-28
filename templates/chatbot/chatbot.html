@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% block title %}Sisterhood Stories - Ask Sisterly AI{% endblock %}
+
+{% block extra_head %}
+<style>
+  body {
+    background: #FFF4F7;
+  }
+  
+  .chatbot-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  
+  .chat-wrapper {
+    background: linear-gradient(135deg, #F88379, #F4A6B5);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(244,166,181,0.22);
+    overflow: hidden;
+  }
+  
+  .chat-header {
+    background: transparent;
+    color: white;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .chat-header-icon {
+    font-size: 24px;
+  }
+  
+  .chat-header-text h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: 0.3px;
+  }
+  
+  .chat-header-text .subtitle {
+    opacity: 0.95;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  
+  .quick-actions {
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .quick-action-btn {
+    background: white;
+    color: #8a3158;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(244,166,181,0.20);
+    transition: all 0.2s;
+  }
+  
+  .quick-action-btn:hover,
+  .quick-action-btn.active {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244,166,181,0.30);
+  }
+  
+  .chat-body {
+    background: white;
+    padding: 24px;
+    min-height: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  
+  .bubble.from-ai {
+    background: white;
+    margin-right: auto;
+    border-top-left-radius: 4px;
+    color: #333;
+    border: 1px solid #f0f0f0;
+  }
+  
+  .bubble.from-user {
+    background: #ffe3ee;
+    margin-left: auto;
+    border-top-right-radius: 4px;
+    color: #333;
+  }
+  
+  .bubble.typing {
+    font-style: italic;
+    color: #666;
+    opacity: 0.9;
+  }
+  
+  .bubble br {
+    line-height: 1.8;
+  }
+  
+  .chat-input-area {
+    padding: 16px 24px;
+    background: white;
+    border-top: 1px solid #f4dbe2;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .chat-input-area .form-control {
+    flex: 1;
+    border: 2px solid #f7c8d4;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .chat-input-area .form-control:focus {
+    outline: none;
+    border-color: #F4A6B5;
+    box-shadow: 0 0 0 3px rgba(244,166,181,0.1);
+  }
+  
+  .btn-send {
+    background: #F4A6B5;
+    border: none;
+    color: white;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .btn-send:hover {
+    background: #F88379;
+  }
+  
+  .btn-send:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 576px) {
+    .bubble {
+      max-width: 90%;
+    }
+    
+    .chat-header {
+      padding: 16px;
+    }
+    
+    .quick-actions {
+      padding: 12px 16px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chatbot-container">
+  <div class="chat-wrapper">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-icon">🤍</div>
+      <div class="chat-header-text">
+        <h3>Ask Sisterly AI</h3>
+        <div class="subtitle">A safe, empathetic space for women's wellness and support</div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <button class="quick-action-btn active" data-prompt="I'm feeling anxious and would like grounding tips.">I'm feeling anxious</button>
+      <button class="quick-action-btn" data-prompt="I need career advice tailored to women in tech.">Career advice</button>
+      <button class="quick-action-btn" data-prompt="I want to report a concern safely and privately.">Report a concern</button>
+      <button class="quick-action-btn" data-prompt="I'd like to talk to a mentor for guidance.">Talk to mentor</button>
+    </div>
+
+    <!-- Chat body -->
+    <div id="chatBody" class="chat-body">
+      <div class="bubble from-ai">Hi sister, I'm here to help. How are you feeling today?</div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      {% csrf_token %}
+      <input id="chatText" class="form-control" placeholder="Type your message..." autocomplete="off" />
+      <button id="sendBtn" class="btn-send">Send</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  'use strict';
+  
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatText');
+  const sendBtn = document.getElementById('sendBtn');
+  let typingIndicator = null;
+  
+  if (!chatBody || !chatInput || !sendBtn) {
+    console.error('Chatbot elements not found');
+    return;
+  }
+  
+  function getCSRFToken() {
+    const tokenInput = document.querySelector('input[name=csrfmiddlewaretoken]');
+    if (tokenInput) return tokenInput.value;
+    
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const parts = cookie.trim().split('=');
+      if (parts[0] === 'csrftoken') return parts[1];
+    }
+    return null;
+  }
+  
+  function addMessage(text, isUser) {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + (isUser ? 'from-user' : 'from-ai');
+    
+    // Escape HTML and convert newlines to <br>
+    const escaped = String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      .replace(/\n/g, '<br>');
+    
+    bubble.innerHTML = escaped;
+    chatBody.appendChild(bubble);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+  
+  function showTyping() {
+    if (typingIndicator) return;
+    typingIndicator = document.createElement('div');
+    typingIndicator.className = 'bubble from-ai typing';
+    typingIndicator.textContent = 'Sisterly AI is thinking…';
+    chatBody.appendChild(typingIndicator);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+  
+  function hideTyping() {
+    if (typingIndicator) {
+      typingIndicator.remove();
+      typingIndicator = null;
+    }
+  }
+  
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    
+    // Show user message
+    addMessage(text, true);
+    chatInput.value = '';
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+    
+    showTyping();
+    
+    try {
+      const csrf = getCSRFToken();
+      if (!csrf) {
+        throw new Error('CSRF token not found');
+      }
+      
+      const formData = new URLSearchParams();
+      formData.append('text', text);
+      
+      const response = await fetch('{% url "chatbot:chat_api" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrf,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData,
+        credentials: 'same-origin'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Server error: ' + response.status);
+      }
+      
+      const data = await response.json();
+      hideTyping();
+      
+      if (data && data.answer) {
+        addMessage(data.answer, false);
+      } else {
+        addMessage('I\'m here for you. Could you share a bit more?', false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      hideTyping();
+      addMessage('Sorry, there was an error. Please try again.', false);
+    } finally {
+      chatInput.disabled = false;
+      sendBtn.disabled = false;
+      chatInput.focus();
+    }
+  }
+  
+  // Send button click
+  sendBtn.addEventListener('click', sendMessage);
+  
+  // Enter key
+  chatInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  
+  // Quick action buttons
+  document.querySelectorAll('.quick-action-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const prompt = this.getAttribute('data-prompt');
+      if (prompt) {
+        chatInput.value = prompt;
+        sendMessage();
+      }
+    });
+  });
+  
+  // Focus input
+  chatInput.focus();
+})();
+</script>
+{% endblock %}

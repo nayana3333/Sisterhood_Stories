@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Story - Sisterhood Stories{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Create New Story</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_content" class="form-label">Your Story (optional)</label>
+                            {{ form.content }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_image" class="form-label">Or upload an image</label>
+                            {{ form.image }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_video" class="form-label">Or upload a video</label>
+                            {{ form.video }}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Your story will be visible for 24 hours.
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'stories:post_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Share Story</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Preview image before upload
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Clear any existing preview
+            const previewContainer = document.getElementById('image-preview');
+            previewContainer.innerHTML = '';
+            
+            // Create and append image preview
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'img-fluid mt-2';
+            img.style.maxHeight = '300px';
+            previewContainer.appendChild(img);
+            
+            // Hide other file inputs
+            document.getElementById('video-preview').innerHTML = '';
+            document.getElementById('id_video').value = '';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Preview video before upload
+function previewVideo(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const url = URL.createObjectURL(file);
+        
+        // Clear any existing preview
+        const previewContainer = document.getElementById('video-preview');
+        previewContainer.innerHTML = '';
+        
+        // Create and append video preview
+        const video = document.createElement('video');
+        video.src = url;
+        video.controls = true;
+        video.className = 'img-fluid mt-2';
+        video.style.maxHeight = '300px';
+        previewContainer.appendChild(video);
+        
+        // Hide other file inputs
+        document.getElementById('image-preview').innerHTML = '';
+        document.getElementById('id_image').value = '';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

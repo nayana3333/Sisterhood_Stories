@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sisterhood Stories - Preview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #FFF4F7;
+            --header-gradient: linear-gradient(135deg, #F88379, #F4A6B5);
+            --card-bg: #FFFFFF;
+            --primary: #F4A6B5;
+            --accent: #F88379;
+            --text: #333333;
+            --text-light: #666666;
+            --border: #F0E6EA;
+            --font-main: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-title: 'Dancing Script', cursive;
+            --shadow: 0 8px 24px rgba(244, 166, 181, 0.12);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --spacing: 1rem;
+            --radius: 16px;
+            --radius-sm: 8px;
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-main);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-header {
+            background: var(--header-gradient);
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .nav-icon {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-left: 1.5rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .nav-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .main-feed {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .right-sidebar {
+            width: 320px;
+            position: sticky;
+            top: 80px;
+            align-self: flex-start;
+        }
+
+        /* Add more styles as needed */
+        .preview-message {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .right-sidebar {
+                display: none;
+            }
+            
+            .main-feed {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar">
+            <a href="#" class="navbar-brand">SISTERHOOD STORIES</a>
+            <div>
+                <a href="#" class="nav-icon"><i class="fas fa-home"></i></a>
+                <a href="#" class="nav-icon"><i class="fas fa-robot"></i></a>
+                <a href="#" class="nav-icon"><i class="fas fa-hands-helping"></i></a>
+                <a href="#" class="nav-icon"><i class="fas fa-user"></i></a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="main-feed">
+            <div class="preview-message">
+                <h2>Sisterhood Stories UI Preview</h2>
+                <p>This is a static preview of the Sisterhood Stories UI.</p>
+                <p>The full application with all features will be available when running the Django server.</p>
+                <div class="mt-4">
+                    <a href="#" class="btn btn-primary" style="background: var(--primary); border: none; padding: 0.5rem 1.5rem; border-radius: 20px;">
+                        View Full Application
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-sidebar">
+            <div style="background: white; padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1rem; color: var(--text-light); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Need Support?</h3>
+                
+                <div style="display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); cursor: pointer;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; margin-right: 0.75rem; color: var(--primary);">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="font-weight: 600; margin: 0 0 0.1rem; font-size: 0.9rem;">AI Chatbot</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin: 0;">Get instant support from our AI assistant</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+                </div>
+                
+                <div style="display: flex; align-items: center; padding: 0.75rem 0; cursor: pointer;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; margin-right: 0.75rem; color: var(--primary);">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="font-weight: 600; margin: 0 0 0.1rem; font-size: 0.9rem;">Professional Counseling</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-light); margin: 0;">Connect with a licensed therapist</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

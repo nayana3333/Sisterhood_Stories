@@ -1,0 +1,69 @@
+{% load static %}
+
+<!-- Stories Component -->
+<div class="stories-section">
+    <h2 class="section-title">Stories</h2>
+    <div class="stories-container">
+        <!-- Stories will be dynamically inserted here by JavaScript -->
+    </div>
+</div>
+
+<!-- Include CSS and JS -->
+<link rel="stylesheet" href="{% static 'css/stories.css' %}">
+<script src="{% static 'js/stories.js' %}"></script>
+
+<!-- Add Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Sample Data Initialization (for demo purposes) -->
+<script>
+// This would be replaced with actual user data in a real implementation
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if we have sample data
+    if (!localStorage.getItem('sisterhood_stories_sample_initialized')) {
+        const sampleStories = [
+            {
+                id: '1',
+                userId: 'user1',
+                username: 'Sarah',
+                userAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+                type: 'img',
+                dataUrl: 'https://source.unsplash.com/random/400x700?women',
+                caption: 'Beautiful day for a walk in the park! 🌳',
+                createdAt: new Date().toISOString(),
+                seen: false
+            },
+            {
+                id: '2',
+                userId: 'user2',
+                username: 'Priya',
+                userAvatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+                type: 'img',
+                dataUrl: 'https://source.unsplash.com/random/400x700?nature',
+                caption: 'Enjoying the sunset 🌅',
+                createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+                seen: false
+            },
+            {
+                id: '3',
+                userId: 'user3',
+                username: 'Aisha',
+                userAvatar: 'https://randomuser.me/api/portraits/women/33.jpg',
+                type: 'video',
+                dataUrl: 'https://assets.mixkit.co/videos/preview/mixkit-woman-dancing-under-neon-lights-1230-large.mp4',
+                caption: 'Dance like nobody\'s watching! 💃',
+                createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+                seen: false
+            }
+        ];
+        
+        localStorage.setItem('sisterhood_stories', JSON.stringify(sampleStories));
+        localStorage.setItem('sisterhood_stories_sample_initialized', 'true');
+    }
+    
+    // Initialize the Story Manager
+    if (typeof StoryManager !== 'undefined') {
+        window.storyManager = new StoryManager();
+    }
+});
+</script>

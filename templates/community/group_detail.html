@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ group.name }} - Community{% endblock %}
+
+{% block extra_head %}
+<style>
+  body {
+    background: #FFF4F7;
+  }
+  
+  .group-detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .group-header {
+    background: linear-gradient(135deg, #F88379, #F4A6B5);
+    color: white;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(244, 166, 181, 0.12);
+  }
+  
+  .group-header h1 {
+    margin: 0 0 12px;
+    font-weight: 800;
+    font-size: 32px;
+  }
+  
+  .group-header .description {
+    opacity: 0.95;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .group-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+  }
+  
+  .action-btn:hover {
+    background: white;
+    color: #F88379;
+  }
+  
+  .action-btn.primary {
+    background: white;
+    color: #F88379;
+  }
+  
+  .action-btn.primary:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .discussion-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+  }
+  
+  .discussion-card:hover {
+    box-shadow: 0 4px 16px rgba(244, 166, 181, 0.15);
+  }
+  
+  .discussion-card.pinned {
+    border-left: 4px solid #F4A6B5;
+  }
+  
+  .discussion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+  
+  .discussion-meta {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .discussion-content {
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  
+  .discussion-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .like-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+  }
+  
+  .like-btn:hover {
+    color: #F4A6B5;
+  }
+  
+  .like-btn.liked {
+    color: #F4A6B5;
+  }
+  
+  .create-discussion-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .form-control, .form-select {
+    border: 2px solid rgba(244, 166, 181, 0.3);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #F4A6B5;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(244, 166, 181, 0.1);
+  }
+  
+  .submit-btn {
+    background: #F4A6B5;
+    border: none;
+    color: white;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .submit-btn:hover {
+    background: #F88379;
+  }
+  
+  .members-sidebar {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    position: sticky;
+    top: 100px;
+  }
+  
+  .member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .member-item:last-child {
+    border-bottom: none;
+  }
+  
+  .member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="group-detail-container">
+  <div class="group-header">
+    <h1>{{ group.name }}</h1>
+    <div class="description">{{ group.description }}</div>
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span style="opacity: 0.9;">{{ member_count }} members</span>
+      <span style="opacity: 0.9;">•</span>
+      <span style="opacity: 0.9;">Created by {{ group.creator.username }}</span>
+    </div>
+    <div class="group-actions">
+      {% if user.is_authenticated %}
+        {% if is_member %}
+          <form method="post" action="{% url 'community:leave_group' group.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn">Leave Group</button>
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'community:join_group' group.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn primary">Join Group</button>
+          </form>
+        {% endif %}
+        <a href="{% url 'community:list' %}" class="action-btn">Back to Groups</a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="action-btn primary">Login to Join</a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="row g-3">
+    <div class="col-lg-8">
+      {% if is_member %}
+      <div class="create-discussion-card">
+        <h5 style="margin: 0 0 16px; color: #333;">Start a Discussion</h5>
+        <form method="post" action="{% url 'community:create_discussion' group.pk %}">
+          {% csrf_token %}
+          {{ discussion_form.title }}
+          {{ discussion_form.content }}
+          <div class="mt-3">
+            <button type="submit" class="submit-btn">Post Discussion</button>
+          </div>
+        </form>
+      </div>
+      {% endif %}
+      
+      <h4 style="margin-bottom: 16px; color: #333;">Discussions</h4>
+      
+      {% if discussions %}
+        {% for discussion in discussions %}
+        <div class="discussion-card {% if discussion.is_pinned %}pinned{% endif %}">
+          <div class="discussion-header">
+            <div>
+              <strong>{{ discussion.author.username }}</strong>
+              <span class="text-muted">• {{ discussion.created_at|timesince }} ago</span>
+              {% if discussion.is_pinned %}
+              <span class="badge" style="background: #F4A6B5; color: white; margin-left: 8px;">Pinned</span>
+              {% endif %}
+            </div>
+          </div>
+          {% if discussion.title %}
+          <h5 style="margin: 8px 0; color: #333;">{{ discussion.title }}</h5>
+          {% endif %}
+          <div class="discussion-content">{{ discussion.content|linebreaks }}</div>
+          <div class="discussion-footer">
+            <a href="{% url 'community:discussion_detail' discussion.pk %}" style="color: #F4A6B5; text-decoration: none;">
+              {{ discussion.comment_count }} comments
+            </a>
+            {% if is_member %}
+            <button class="like-btn {% if discussion.user_liked %}liked{% endif %}" data-discussion-id="{{ discussion.pk }}" onclick="toggleLike({{ discussion.pk }})">
+              <span>❤️</span>
+              <span id="like-count-{{ discussion.pk }}">{{ discussion.like_count }}</span>
+            </button>
+            {% else %}
+            <span>{{ discussion.like_count }} likes</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="discussion-card text-center py-5">
+          <p class="text-muted">No discussions yet. Be the first to start one!</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="members-sidebar">
+        <h5 style="margin: 0 0 16px; color: #333;">Members ({{ member_count }})</h5>
+        {% for member in members %}
+        <div class="member-item">
+          {% if member.user.profile and member.user.profile.image %}
+            <img class="member-avatar" src="{{ member.user.profile.image.url }}" alt="{{ member.user.username }}" />
+          {% else %}
+            <img class="member-avatar" src="https://randomuser.me/api/portraits/women/{{ forloop.counter|add:20 }}.jpg" alt="{{ member.user.username }}" />
+          {% endif %}
+          <div>
+            <div style="font-weight: 600; color: #333;">{{ member.user.username }}</div>
+            {% if member.role != 'member' %}
+            <div class="small text-muted">{{ member.get_role_display }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        {% if member_count > 10 %}
+        <div class="text-center mt-3">
+          <a href="#" class="small" style="color: #F4A6B5;">View all members</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleLike(discussionId) {
+  fetch('/community/discussion/' + discussionId + '/like/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'same-origin'
+  })
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(data => {
+        throw new Error(data.error || 'Failed to like');
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    const btn = document.querySelector(`button[data-discussion-id="${discussionId}"]`);
+    const countEl = document.getElementById('like-count-' + discussionId);
+    
+    if (btn) {
+      if (data.liked) {
+        btn.classList.add('liked');
+      } else {
+        btn.classList.remove('liked');
+      }
+    }
+    
+    if (countEl) {
+      countEl.textContent = data.like_count;
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert(error.message || 'Failed to like discussion');
+  });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}
+

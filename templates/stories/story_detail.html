@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ story.user.username }}'s Story - Sisterhood Stories{% endblock %}
+
+{% block extra_css %}
+<style>
+    .story-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #000;
+        min-height: 100vh;
+        position: relative;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .story-media {
+        max-width: 100%;
+        max-height: 80vh;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .story-content {
+        padding: 20px;
+        font-size: 24px;
+        line-height: 1.5;
+    }
+    
+    .story-username {
+        font-weight: bold;
+        margin: 20px 0 10px;
+    }
+    
+    .story-time {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+    }
+    
+    .story-close {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 24px;
+        z-index: 10;
+        text-decoration: none;
+    }
+    
+    .story-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .nav-button {
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="story-container">
+    <!-- Close button -->
+    <a href="{% url 'stories:post_list' %}" class="story-close">
+        <i class="fas fa-times"></i>
+    </a>
+    
+    <!-- Navigation -->
+    <div class="story-nav">
+        {% if prev_story %}
+            <a href="{% url 'stories:story_detail' prev_story.id %}" class="nav-button">Previous</a>
+        {% else %}
+            <span></span>
+        {% endif %}
+        
+        {% if next_story %}
+            <a href="{% url 'stories:story_detail' next_story.id %}" class="nav-button">Next</a>
+        {% else %}
+            <a href="{% url 'stories:post_list' %}" class="nav-button">Back to Feed</a>
+        {% endif %}
+    </div>
+    
+    <!-- Story content -->
+    <div>
+        {% if story.story_type == 'image' and story.image %}
+            <img src="{{ story.image.url }}" alt="Story image" class="story-media">
+        {% elif story.story_type == 'video' and story.video %}
+            <video src="{{ story.video.url }}" class="story-media" controls autoplay></video>
+        {% else %}
+            <div class="story-content">
+                {{ story.content|linebreaksbr }}
+            </div>
+        {% endif %}
+        
+        <div class="story-username">
+            {% if story.user.profile and story.user.profile.image %}
+                <img src="{{ story.user.profile.image.url }}" 
+                     alt="{{ story.user.username }}"
+                     style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+            {% endif %}
+            {{ story.user.username }}
+        </div>
+        <div class="story-time">{{ story.created_at|timesince }} ago</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Store story URLs in data attributes -->
+<div id="story-nav-data" 
+     data-prev-url="{% if prev_story %}{% url 'stories:story_detail' prev_story.id %}{% endif %}"
+     data-next-url="{% if next_story %}{% url 'stories:story_detail' next_story.id %}{% endif %}"
+     data-feed-url="{% url 'stories:post_list' %}">
+</div>
+
+<script>
+// Simple keyboard navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const navData = document.getElementById('story-nav-data');
+    const prevUrl = navData.dataset.prevUrl;
+    const nextUrl = navData.dataset.nextUrl;
+    const feedUrl = navData.dataset.feedUrl;
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft' && prevUrl) {
+            window.location.href = prevUrl;
+        } else if ((e.key === 'ArrowRight' || e.key === ' ') && nextUrl) {
+            window.location.href = nextUrl;
+        } else if (e.key === 'Escape') {
+            window.location.href = feedUrl;
+        }
+    });
+});
+</script>
+{% endblock %}

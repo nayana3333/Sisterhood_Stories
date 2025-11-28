@@ -1,0 +1,1298 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sisterhood Stories - Home{% endblock %}
+
+{% block extra_head %}
+<style>
+  body {
+    background: var(--bg);
+  }
+  
+  .home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+  
+  /* Stories Section */
+  .stories-section {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .stories-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .stories-header h3 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 18px;
+  }
+  
+  .add-story-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .add-story-btn:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+  }
+  
+  .stories-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 8px 0 16px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .stories-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .story-item {
+    flex: 0 0 auto;
+    width: 70px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .story-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .story-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    padding: 3px;
+    margin: 0 auto 8px;
+    background: var(--header-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .story-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+  }
+  
+  .story-username {
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .stories-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 8px;
+    text-align: center;
+  }
+  
+  /* Main Layout */
+  .main-layout {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+  
+  .posts-feed {
+    flex: 1;
+    max-width: 600px;
+  }
+  
+  .right-sidebar {
+    width: 320px;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+    height: fit-content;
+  }
+  
+  /* Post Card */
+  .post-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  
+  .post-header {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  
+  .post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+  }
+  
+  .post-user-info {
+    flex: 1;
+  }
+  
+  .post-username {
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .post-time {
+    font-size: 12px;
+    color: #8e8e8e;
+    margin: 0;
+  }
+  
+  .post-image {
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .post-actions {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 16px;
+  }
+  
+  .post-action {
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: none;
+    background: none;
+    padding: 0;
+    line-height: 1;
+  }
+  
+  .post-action:hover {
+    transform: scale(1.15);
+  }
+  
+  .post-action.like-btn {
+    font-size: 26px;
+    transition: all 0.2s ease;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .post-action.like-btn span {
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+  
+  .post-action.like-btn.liked span {
+    filter: drop-shadow(0 2px 8px rgba(248, 131, 121, 0.7)) 
+            brightness(1.2) 
+            saturate(1.8)
+            hue-rotate(-15deg);
+    transform: scale(1.2);
+    animation: heartBeat 0.3s ease;
+  }
+  
+  @keyframes heartBeat {
+    0%, 100% { transform: scale(1.2); }
+    50% { transform: scale(1.4); }
+  }
+  
+  .post-action.like-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(248, 131, 121, 0.3);
+    transition: width 0.3s ease, height 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .post-action.like-btn.liked::before {
+    width: 40px;
+    height: 40px;
+    animation: heartPulse 0.4s ease;
+  }
+  
+  @keyframes heartPulse {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 1;
+    }
+    50% {
+      width: 50px;
+      height: 50px;
+      opacity: 0.8;
+    }
+    100% {
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+    }
+  }
+  
+  .post-action.save {
+    margin-left: auto;
+  }
+  
+  .post-likes {
+    font-weight: 600;
+    padding: 0 16px 8px;
+    color: var(--text);
+    font-size: 14px;
+  }
+  
+  .post-caption {
+    padding: 0 16px 8px;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .post-caption strong {
+    margin-right: 8px;
+    font-weight: 600;
+  }
+  
+  .post-time-bottom {
+    font-size: 10px;
+    color: #8e8e8e;
+    text-transform: uppercase;
+    padding: 0 16px 12px;
+    letter-spacing: 0.5px;
+  }
+  
+  .post-comment-form {
+    display: flex;
+    padding: 12px 16px;
+    border-top: 1px solid #efefef;
+    align-items: center;
+  }
+  
+  .post-comment-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 0;
+    font-family: var(--font-main);
+  }
+  
+  .post-comment-btn {
+    border: none;
+    background: none;
+    color: #0095f6;
+    font-weight: 600;
+    opacity: 0.3;
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    transition: opacity 0.2s ease;
+  }
+  
+  .post-comment-btn.active {
+    opacity: 1;
+  }
+  
+  .post-comment-btn:hover.active {
+    opacity: 0.8;
+  }
+  
+  /* Sidebar Cards */
+  .sidebar-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .sidebar-card h6 {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  
+  .sidebar-card p {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  
+  .sidebar-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .sidebar-btn:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+    color: white;
+  }
+  
+  .sidebar-btn.outline {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+  
+  .sidebar-btn.outline:hover {
+    background: var(--bg);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  
+  /* Modals */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .modal-overlay.active {
+    display: flex;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-light);
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+  
+  .modal-close:hover {
+    background: #f0f0f0;
+    color: var(--text);
+  }
+  
+  .modal-form-group {
+    margin-bottom: 20px;
+  }
+  
+  .modal-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  
+  .modal-form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid rgba(244, 166, 181, 0.3);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+  
+  .modal-form-control:focus {
+    outline: none;
+    border-color: #F4A6B5;
+    box-shadow: 0 0 0 3px rgba(244, 166, 181, 0.1);
+  }
+  
+  .modal-form-control textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .modal-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .modal-checkbox input {
+    width: auto;
+    cursor: pointer;
+  }
+  
+  .modal-checkbox label {
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    margin: 0;
+  }
+  
+  .modal-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #F88379, #F4A6B5);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+  }
+  
+  .modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244, 166, 181, 0.3);
+  }
+  
+  .modal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .image-preview {
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 200px;
+  }
+  
+  .image-preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 992px) {
+    .right-sidebar {
+      display: none;
+    }
+    
+    .posts-feed {
+      max-width: 100%;
+    }
+    
+    .main-layout {
+      justify-content: flex-start;
+    }
+    
+    .home-container {
+      padding: 0 16px 40px;
+    }
+    
+    .stories-section {
+      padding: 16px;
+    }
+    
+    .post-card {
+      margin-bottom: 20px;
+    }
+    
+    .modal-content {
+      padding: 20px;
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .home-container {
+      padding: 0 12px 30px;
+    }
+    
+    .stories-section {
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .stories-header h3 {
+      font-size: 16px;
+    }
+    
+    .add-story-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    .story-item {
+      width: 60px;
+    }
+    
+    .story-avatar {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .story-username {
+      font-size: 11px;
+    }
+    
+    .post-header {
+      padding: 12px;
+    }
+    
+    .post-actions {
+      padding: 10px 12px;
+      gap: 12px;
+    }
+    
+    .post-action {
+      font-size: 20px;
+    }
+    
+    .post-action.like-btn {
+      font-size: 22px;
+    }
+    
+    .post-action.like-btn span {
+      font-size: 22px;
+    }
+    
+    .post-caption {
+      padding: 0 12px 8px;
+      font-size: 13px;
+    }
+    
+    .post-likes {
+      padding: 0 12px 8px;
+      font-size: 13px;
+    }
+    
+    .post-comment-form {
+      padding: 10px 12px;
+    }
+    
+    .modal-content {
+      padding: 20px;
+      max-width: 100%;
+      margin: 10px;
+    }
+    
+    .modal-header h3 {
+      font-size: 18px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .stories-header {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .stories-header h3 {
+      font-size: 15px;
+    }
+    
+    .add-story-btn {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+    
+    .story-item {
+      width: 55px;
+    }
+    
+    .story-avatar {
+      width: 55px;
+      height: 55px;
+    }
+    
+    .post-card {
+      margin-bottom: 16px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+  <!-- Stories Section -->
+  <div class="stories-section">
+    <div class="stories-header">
+      <h3>Stories</h3>
+      {% if user.is_authenticated %}
+      <button class="add-story-btn" onclick="openStoryModal()">
+        <span>Add Story</span>
+        <span>+</span>
+      </button>
+      {% endif %}
+    </div>
+    <div class="stories-scroll">
+      {% if user.is_authenticated %}
+      <div class="story-item">
+        <a href="{% url 'stories:story_create' %}" style="text-decoration: none; color: inherit;">
+          <div class="story-avatar" style="background: var(--header-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+            {% if user.profile and user.profile.image %}
+              <img src="{{ user.profile.image.url }}" alt="Your Story">
+            {% else %}
+              <div style="width: 100%; height: 100%; border-radius: 50%; background: #e4e6eb; display: flex; align-items: center; justify-content: center; color: #999; font-size: 20px;">+</div>
+            {% endif %}
+          </div>
+          <div class="story-username">Your Story</div>
+        </a>
+      </div>
+      {% endif %}
+      
+      {% for story in active_stories|slice:":8" %}
+      <div class="story-item">
+        <a href="{% url 'stories:story_detail' story.id %}" style="text-decoration: none; color: inherit;">
+          <div class="story-avatar">
+            {% if story.user.profile and story.user.profile.image %}
+              <img src="{{ story.user.profile.image.url }}" alt="{{ story.user.username }}">
+            {% else %}
+              <img src="https://randomuser.me/api/portraits/women/{{ forloop.counter|add:10 }}.jpg" alt="{{ story.user.username }}">
+            {% endif %}
+          </div>
+          <div class="story-username">{{ story.user.username|truncatechars:10 }}</div>
+        </a>
+      </div>
+      {% endfor %}
+      
+      {% if not active_stories %}
+      {% for i in "12345678" %}
+      <div class="story-item">
+        <div class="story-avatar">
+          <img src="https://randomuser.me/api/portraits/women/{{ forloop.counter|add:10 }}.jpg" alt="Sister {{ forloop.counter }}">
+        </div>
+        <div class="story-username">Sister {{ forloop.counter }}</div>
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    <div class="stories-hint">Tap a story to view • Autoplays with progress</div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Posts Feed -->
+    <div class="posts-feed">
+      {% if user.is_authenticated %}
+      <div class="post-card" style="padding: 20px; text-align: center; cursor: pointer;" onclick="openPostModal()">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--text-light);">
+          <span style="font-size: 24px;">✍️</span>
+          <span style="font-weight: 600; font-size: 16px;">Create a new post</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% for post in posts %}
+      <div class="post-card" data-post-id="{{ post.id }}">
+        <div class="post-header">
+          {% if post.is_anonymous %}
+            <div class="post-avatar" style="background: linear-gradient(135deg, #F88379, #F4A6B5); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 18px; border: 2px solid #f0f0f0;">
+              {% if post.pseudonym %}
+                {{ post.pseudonym|first|upper }}
+              {% else %}
+                A
+              {% endif %}
+            </div>
+          {% else %}
+            {% if post.author.profile and post.author.profile.image %}
+              <img src="{{ post.author.profile.image.url }}" alt="{{ post.author.username }}" class="post-avatar">
+            {% else %}
+              <img src="https://randomuser.me/api/portraits/women/{{ forloop.counter|add:20 }}.jpg" alt="{{ post.author.username }}" class="post-avatar">
+            {% endif %}
+          {% endif %}
+          <div class="post-user-info">
+            <div class="post-username">
+              {% if post.is_anonymous %}
+                {% if post.pseudonym %}
+                  {{ post.pseudonym }}
+                {% else %}
+                  Anonymous
+                {% endif %}
+              {% else %}
+                {{ post.author.username }}
+              {% endif %}
+            </div>
+            <div class="post-time">{{ post.created_at|timesince }} ago</div>
+          </div>
+        </div>
+        
+        {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+        {% endif %}
+        
+        <div class="post-actions">
+          <button class="post-action like-btn {% if post.id in liked_post_ids %}liked{% endif %}" data-post-id="{{ post.id }}" data-action="like" title="Like">
+            <span style="font-size: 26px;">🫀</span>
+          </button>
+          <button class="post-action comment-btn" data-post-id="{{ post.id }}" data-action="comment" title="Comment">
+            <span style="font-size: 24px;">💬</span>
+          </button>
+          <button class="post-action share-btn" data-post-id="{{ post.id }}" data-action="share" title="Share">
+            <span style="font-size: 24px;">🔗</span>
+          </button>
+          <button class="post-action save" data-post-id="{{ post.id }}" data-action="save" title="Save">
+            <span style="font-size: 24px;">🔖</span>
+          </button>
+        </div>
+        
+        <div class="post-likes">
+          <span id="like-count-{{ post.id }}">{{ post.like_set.count }}</span> likes
+        </div>
+        
+        {% if post.content %}
+        <div class="post-caption">
+          <strong>
+            {% if post.is_anonymous %}
+              {% if post.pseudonym %}
+                {{ post.pseudonym }}
+              {% else %}
+                Anonymous
+              {% endif %}
+            {% else %}
+              {{ post.author.username }}
+            {% endif %}
+          </strong>
+          {{ post.content }}
+        </div>
+        {% endif %}
+        
+        <div class="post-time-bottom">{{ post.created_at|timesince|upper }} AGO</div>
+        
+        {% if post.allow_comments %}
+        <div class="post-comment-form">
+          <input type="text" placeholder="Add a comment..." class="post-comment-input" data-post-id="{{ post.id }}" data-action="comment-input">
+          <button class="post-comment-btn" id="comment-btn-{{ post.id }}" data-post-id="{{ post.id }}" data-action="quick-comment" disabled>Post</button>
+        </div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="post-card" style="text-align: center; padding: 60px 20px;">
+        <p style="color: #8e8e8e; font-size: 16px; margin-bottom: 20px;">No posts yet. Be the first to share!</p>
+        {% if user.is_authenticated %}
+        <button class="modal-btn" onclick="openPostModal()" style="max-width: 200px; margin: 0 auto;">Create Your First Post</button>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="modal-btn" style="max-width: 200px; margin: 0 auto; display: block; text-decoration: none;">Login to Post</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+      <div class="sidebar-card">
+        <h6>Need Support?</h6>
+        <p>Talk to the AI or book a confidential session.</p>
+        <a href="{% url 'chatbot:chat' %}" class="sidebar-btn">AI Chatbot</a>
+        <a href="{% url 'counseling:list' %}" class="sidebar-btn outline">Counseling</a>
+      </div>
+      
+      <div class="sidebar-card">
+        <h6>Recommended for you</h6>
+        <p>Curated posts and stories coming soon.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Post Modal -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create a Post</h3>
+      <button class="modal-close" onclick="closePostModal()">&times;</button>
+    </div>
+    <form id="postForm" method="post" action="{% url 'stories:post_create' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-form-group">
+        <textarea name="content" class="modal-form-control" rows="4" placeholder="Share a thought…"></textarea>
+      </div>
+      <div class="modal-form-group">
+        <label class="modal-form-label">Image</label>
+        <input type="file" name="image" accept="image/*" class="modal-form-control" onchange="previewPostImage(this)">
+        <div id="postImagePreview" class="image-preview" style="display: none;"></div>
+      </div>
+      <div class="modal-form-group">
+        <label class="modal-form-label">File</label>
+        <input type="file" name="file" class="modal-form-control">
+      </div>
+      <div class="modal-checkbox">
+        <input type="checkbox" name="is_anonymous" id="postAnon" onchange="togglePseudonymField()">
+        <label for="postAnon">Post anonymously</label>
+      </div>
+      <div class="modal-form-group" id="pseudonymGroup" style="display: none;">
+        <label class="modal-form-label">Display Name (Optional)</label>
+        <input type="text" name="pseudonym" id="postPseudonym" class="modal-form-control" placeholder="Enter a name to display (leave blank for 'Anonymous')" maxlength="80">
+        <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">If left blank, your post will show as "Anonymous"</small>
+      </div>
+      <div class="modal-checkbox">
+        <input type="checkbox" name="allow_comments" id="postAllowComments" checked>
+        <label for="postAllowComments">Allow comments</label>
+      </div>
+      <button type="submit" class="modal-btn">Post</button>
+    </form>
+  </div>
+</div>
+
+<!-- Create Story Modal -->
+<div class="modal-overlay" id="storyModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create a Story</h3>
+      <button class="modal-close" onclick="closeStoryModal()">&times;</button>
+    </div>
+    <form id="storyForm" method="post" action="{% url 'stories:story_create' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-form-group">
+        <textarea name="content" class="modal-form-control" rows="4" placeholder="Share your story…"></textarea>
+      </div>
+      <div class="modal-form-group">
+        <label class="modal-form-label">Image</label>
+        <input type="file" name="image" accept="image/*" class="modal-form-control" onchange="previewStoryImage(this)">
+        <div id="storyImagePreview" class="image-preview" style="display: none;"></div>
+      </div>
+      <div class="modal-form-group">
+        <label class="modal-form-label">Video</label>
+        <input type="file" name="video" accept="video/*" class="modal-form-control">
+      </div>
+      <button type="submit" class="modal-btn">Share Story</button>
+    </form>
+  </div>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal-overlay" id="commentModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Comments</h3>
+      <button class="modal-close" onclick="closeCommentModal()">&times;</button>
+    </div>
+    <div id="commentsList" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
+    <div class="post-comment-form" style="border-top: 1px solid #f0f0f0; padding-top: 16px;">
+      <input type="text" placeholder="Add a comment..." class="post-comment-input" id="modalCommentInput" onkeyup="handleModalCommentInput()">
+      <button class="post-comment-btn" id="modalCommentBtn" onclick="addComment()" disabled>Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Share</h3>
+      <button class="modal-close" onclick="closeShareModal()">&times;</button>
+    </div>
+    <div class="share-option" onclick="copyLink()" style="padding: 16px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: background 0.2s ease; border: 2px solid #f0f0f0;">
+      <strong style="font-size: 16px; color: var(--text);">Copy Link</strong>
+    </div>
+    <div class="share-option" onclick="shareToGroup()" style="padding: 16px; border-radius: 12px; cursor: pointer; transition: background 0.2s ease; border: 2px solid #f0f0f0;">
+      <strong style="font-size: 16px; color: var(--text);">Share to Group</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+// Modal functions
+function openPostModal() {
+  document.getElementById('postModal').classList.add('active');
+}
+
+function closePostModal() {
+  document.getElementById('postModal').classList.remove('active');
+  document.getElementById('postForm').reset();
+  document.getElementById('postImagePreview').style.display = 'none';
+  document.getElementById('pseudonymGroup').style.display = 'none';
+  document.getElementById('postAnon').checked = false;
+}
+
+function togglePseudonymField() {
+  const anonCheckbox = document.getElementById('postAnon');
+  const pseudonymGroup = document.getElementById('pseudonymGroup');
+  const pseudonymInput = document.getElementById('postPseudonym');
+  
+  if (anonCheckbox.checked) {
+    pseudonymGroup.style.display = 'block';
+    pseudonymInput.placeholder = 'Enter a name to display (leave blank for "Anonymous")';
+  } else {
+    pseudonymGroup.style.display = 'none';
+    pseudonymInput.value = '';
+  }
+}
+
+function openStoryModal() {
+  document.getElementById('storyModal').classList.add('active');
+}
+
+function closeStoryModal() {
+  document.getElementById('storyModal').classList.remove('active');
+  document.getElementById('storyForm').reset();
+  document.getElementById('storyImagePreview').style.display = 'none';
+}
+
+function previewPostImage(input) {
+  const preview = document.getElementById('postImagePreview');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function previewStoryImage(input) {
+  const preview = document.getElementById('storyImagePreview');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+// Load state from localStorage
+function loadState() {
+  const saved = localStorage.getItem('postState');
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return {};
+}
+
+// Save state to localStorage
+function saveState(state) {
+  localStorage.setItem('postState', JSON.stringify(state));
+}
+
+// Toggle like
+function toggleLike(postId) {
+  const state = loadState();
+  const btn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+  const wasLiked = btn?.classList.contains('liked');
+  const countEl = document.getElementById(`like-count-${postId}`);
+  
+  let currentLikes = parseInt(countEl?.textContent) || 0;
+  const newLikes = wasLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+  
+  const postState = state[postId] || { liked: false, likes: currentLikes };
+  postState.liked = !wasLiked;
+  postState.likes = newLikes;
+  state[postId] = postState;
+  saveState(state);
+  
+  if (postState.liked) {
+    btn?.classList.add('liked');
+  } else {
+    btn?.classList.remove('liked');
+  }
+  if (countEl) countEl.textContent = newLikes;
+  
+  // Send AJAX request
+  fetch('/stories/like/' + postId + '/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  }).catch(err => console.error('Like error:', err));
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Toggle save
+function toggleSave(postId) {
+  const state = loadState();
+  const postState = state[postId] || {};
+  postState.saved = !postState.saved;
+  state[postId] = postState;
+  saveState(state);
+  alert(postState.saved ? 'Post saved!' : 'Post unsaved!');
+}
+
+// Comment functions
+let currentPostId = null;
+
+function openCommentModal(postId) {
+  currentPostId = postId;
+  const state = loadState();
+  const postState = state[postId] || { comments: [] };
+  const modal = document.getElementById('commentModal');
+  const list = document.getElementById('commentsList');
+  
+  list.innerHTML = '';
+  if (postState.comments && postState.comments.length > 0) {
+    postState.comments.forEach(comment => {
+      const commentEl = document.createElement('div');
+      commentEl.className = 'comment-item';
+      commentEl.innerHTML = `
+        <span class="comment-author">${comment.author}:</span>
+        <span class="comment-text">${comment.text}</span>
+      `;
+      list.appendChild(commentEl);
+    });
+  } else {
+    list.innerHTML = '<p style="color: #8e8e8e; text-align: center; padding: 20px;">No comments yet</p>';
+  }
+  
+  modal.classList.add('active');
+}
+
+function closeCommentModal() {
+  document.getElementById('commentModal').classList.remove('active');
+  document.getElementById('modalCommentInput').value = '';
+  document.getElementById('modalCommentBtn').disabled = true;
+}
+
+function handleModalCommentInput() {
+  const input = document.getElementById('modalCommentInput');
+  const btn = document.getElementById('modalCommentBtn');
+  btn.disabled = !input.value.trim();
+  if (input.value.trim()) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+}
+
+function addComment() {
+  const input = document.getElementById('modalCommentInput');
+  const text = input.value.trim();
+  if (!text || !currentPostId) return;
+  
+  const state = loadState();
+  const postState = state[currentPostId] || { comments: [] };
+  if (!postState.comments) postState.comments = [];
+  
+  postState.comments.push({
+    author: 'You',
+    text: text
+  });
+  state[currentPostId] = postState;
+  saveState(state);
+  
+  input.value = '';
+  document.getElementById('modalCommentBtn').disabled = true;
+  openCommentModal(currentPostId);
+}
+
+function addQuickComment(postId) {
+  const input = document.querySelector(`.post-comment-input[data-post-id="${postId}"]`);
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const state = loadState();
+  const postState = state[postId] || { comments: [] };
+  if (!postState.comments) postState.comments = [];
+  
+  postState.comments.push({
+    author: 'You',
+    text: text
+  });
+  state[postId] = postState;
+  saveState(state);
+  
+  input.value = '';
+  document.getElementById(`comment-btn-${postId}`).disabled = true;
+  alert('Comment added!');
+}
+
+function handleCommentInput(input, postId) {
+  const btn = document.getElementById(`comment-btn-${postId}`);
+  btn.disabled = !input.value.trim();
+  if (input.value.trim()) {
+    btn.classList.add('active');
+  } else {
+    btn.classList.remove('active');
+  }
+}
+
+// Share functions
+function openShareModal(postId) {
+  document.getElementById('shareModal').classList.add('active');
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('active');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href);
+  alert('Link copied to clipboard!');
+  closeShareModal();
+}
+
+function shareToGroup() {
+  alert('Share to group feature coming soon!');
+  closeShareModal();
+}
+
+// Close modals on outside click
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('active');
+  }
+});
+
+// Event delegation for post actions
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle post action buttons (like, comment, share, save)
+  document.addEventListener('click', function(e) {
+    const action = e.target.closest('[data-action]');
+    if (!action) return;
+    
+    const postId = parseInt(action.getAttribute('data-post-id'));
+    const actionType = action.getAttribute('data-action');
+    
+    if (!postId) return;
+    
+    switch(actionType) {
+      case 'like':
+        toggleLike(postId);
+        break;
+      case 'comment':
+        openCommentModal(postId);
+        break;
+      case 'share':
+        openShareModal(postId);
+        break;
+      case 'save':
+        toggleSave(postId);
+        break;
+      case 'quick-comment':
+        addQuickComment(postId);
+        break;
+    }
+  });
+  
+  // Handle comment input fields
+  document.addEventListener('keyup', function(e) {
+    if (e.target.classList.contains('post-comment-input') && e.target.hasAttribute('data-action')) {
+      const postId = parseInt(e.target.getAttribute('data-post-id'));
+      if (postId) {
+        handleCommentInput(e.target, postId);
+      }
+    }
+  });
+  
+  // Handle Enter key on comment inputs
+  document.addEventListener('keypress', function(e) {
+    if (e.target.classList.contains('post-comment-input') && e.target.hasAttribute('data-action') && e.key === 'Enter') {
+      const postId = parseInt(e.target.getAttribute('data-post-id'));
+      const btn = document.getElementById('comment-btn-' + postId);
+      if (postId && btn && !btn.disabled) {
+        addQuickComment(postId);
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sisterhood Stories - My Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+  body {
+    background: #FFF4F7;
+  }
+  
+  .profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Profile Header Card */
+  .profile-header-card {
+    background: linear-gradient(135deg, #F88379, #F4A6B5);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+  }
+  
+  .profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  .profile-info {
+    flex: 1;
+  }
+  
+  .profile-email {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  
+  .profile-welcome {
+    font-size: 14px;
+    opacity: 0.95;
+    margin: 0;
+  }
+  
+  .profile-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .profile-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid white;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .profile-btn:hover {
+    background: white;
+    color: #F88379;
+  }
+  
+  /* Tabs */
+  .profile-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  
+  .profile-tab {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .profile-tab.active {
+    background: #F4A6B5;
+    color: white;
+  }
+  
+  .profile-tab:hover {
+    background: #FFF5F9;
+  }
+  
+  .profile-tab.active:hover {
+    background: #F88379;
+  }
+  
+  /* Content Layout */
+  .profile-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  
+  @media (max-width: 992px) {
+    .profile-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Cards */
+  .profile-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+  }
+  
+  .profile-card h5 {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    font-size: 18px;
+  }
+  
+  .profile-card .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  
+  .profile-card .form-control,
+  .profile-card textarea {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .profile-card textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .profile-card .form-control:focus,
+  .profile-card textarea:focus {
+    outline: none;
+    border-color: #F4A6B5;
+    box-shadow: 0 0 0 3px rgba(244,166,181,0.1);
+  }
+  
+  .profile-card .form-control[disabled] {
+    background: #f5f5f5;
+    cursor: not-allowed;
+  }
+  
+  .profile-card .form-check {
+    margin-bottom: 16px;
+  }
+  
+  .profile-card .form-check-input {
+    margin-right: 8px;
+  }
+  
+  .profile-card .form-check-label {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .profile-btn-primary {
+    background: #F4A6B5;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .profile-btn-primary:hover {
+    background: #F88379;
+  }
+  
+  .profile-btn-outline {
+    background: white;
+    color: #F4A6B5;
+    border: 2px solid #F4A6B5;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .profile-btn-outline:hover {
+    background: #FFF5F9;
+  }
+  
+  /* Tab Panels */
+  .tab-panel {
+    display: none;
+  }
+  
+  .tab-panel.active {
+    display: block;
+  }
+  
+  .empty-state {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    color: #8e8e8e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .post-item {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .post-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .post-item-author {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .post-item-time {
+    font-size: 12px;
+    color: #8e8e8e;
+  }
+  
+  .post-item-content {
+    color: #333;
+    margin-bottom: 12px;
+  }
+  
+  .post-item-image {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 992px) {
+    .profile-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .profile-container {
+      padding: 16px;
+    }
+    
+    .profile-header-card {
+      flex-wrap: wrap;
+      padding: 20px;
+    }
+    
+    .profile-actions {
+      width: 100%;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    
+    .profile-tabs {
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    
+    .profile-tab {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    .profile-card {
+      padding: 16px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .profile-header-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 16px;
+    }
+    
+    .profile-photo {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .profile-email {
+      font-size: 16px;
+    }
+    
+    .profile-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .profile-btn {
+      width: 100%;
+      text-align: center;
+    }
+    
+    .profile-tabs {
+      flex-direction: column;
+    }
+    
+    .profile-tab {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+  <!-- Profile Header -->
+  <div class="profile-header-card">
+    <img class="profile-photo" src="{% if user.profile and user.profile.image %}{{ user.profile.image.url }}{% else %}https://randomuser.me/api/portraits/women/75.jpg{% endif %}" alt="{{ user.username }}" />
+    <div class="profile-info">
+      <h2 class="profile-email">{{ user.email }}</h2>
+      <p class="profile-welcome">Welcome to your safe space. Share, connect, and grow.</p>
+    </div>
+    <div class="profile-actions">
+      {% if not user.is_authenticated %}
+      <a href="{% url 'accounts:login' %}" class="profile-btn">Login</a>
+      <a href="{% url 'accounts:register' %}" class="profile-btn">Register</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="profile-btn" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; border-radius: 20px; padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Logout</button>
+      </form>
+      {% endif %}
+      <a href="{% url 'counseling:list' %}" class="profile-btn">Book a Session</a>
+      <a href="{% url 'counseling:list' %}" class="profile-btn">Past Sessions</a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="profile-tabs">
+    <button class="profile-tab active" data-tab="posts">My Posts</button>
+    <button class="profile-tab" data-tab="comments">My Comments</button>
+    <button class="profile-tab" data-tab="groups">My Groups</button>
+    <button class="profile-tab" data-tab="edit">Edit Profile</button>
+  </div>
+
+  <!-- Content -->
+  <div class="profile-content">
+    <!-- Left Column -->
+    <div>
+      <!-- Create Post -->
+      <div class="profile-card">
+        <h5>Create a Post</h5>
+        <form method="post" action="{% url 'stories:post_create' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <textarea class="form-control" name="content" rows="4" placeholder="Share a thought…"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Image</label>
+            <input type="file" name="image" accept="image/*" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">File</label>
+            <input type="file" name="file" class="form-control" />
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="anon" name="is_anonymous" onchange="toggleProfilePseudonymField()">
+            <label class="form-check-label" for="anon">Post anonymously</label>
+          </div>
+          <div class="form-group mb-3" id="profilePseudonymGroup" style="display: none;">
+            <label for="pseudonym">Display Name (Optional)</label>
+            <input type="text" class="form-control" id="pseudonym" name="pseudonym" placeholder="Enter a name to display (leave blank for 'Anonymous')" maxlength="80">
+            <small style="color: #666; font-size: 12px;">If left blank, your post will show as "Anonymous"</small>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="allowc" name="allow_comments" checked>
+            <label class="form-check-label" for="allowc">Allow comments</label>
+          </div>
+          <button type="submit" class="profile-btn-primary">Post</button>
+        </form>
+      </div>
+
+      <!-- About -->
+      <div class="profile-card">
+        <h5>About</h5>
+        <form method="post" action="{% url 'accounts:profile' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">About Me</label>
+            <textarea class="form-control" name="about" rows="3" placeholder="A few words about you…">{% if user.profile %}{{ user.profile.about }}{% endif %}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Interests</label>
+            <input type="text" class="form-control" name="interests" placeholder="e.g., mindfulness, tech, reading" value="{% if user.profile %}{{ user.profile.interests }}{% endif %}" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Joined Since</label>
+            <input type="text" class="form-control" value="{{ user.date_joined|date:'M Y' }}" disabled />
+          </div>
+          <button type="submit" class="profile-btn-outline">Save</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <!-- My Posts Tab -->
+      <div id="tab-posts" class="tab-panel active">
+        {% if my_posts %}
+          {% for post in my_posts %}
+          <div class="post-item">
+            <div class="post-item-header">
+              <span class="post-item-author">
+                {% if post.is_anonymous %}
+                  {% if post.pseudonym %}
+                    {{ post.pseudonym }} <span style="color: #999; font-size: 12px;">(Anonymous)</span>
+                  {% else %}
+                    Anonymous
+                  {% endif %}
+                {% else %}
+                  {{ user.username }}
+                {% endif %}
+              </span>
+              <span class="post-item-time">{{ post.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+            {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post image" class="post-item-image" />
+            {% endif %}
+            <div class="post-item-content">{{ post.content }}</div>
+            <form method="post" action="{% url 'stories:post_delete' post.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="profile-btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="return confirm('Delete this post?')">Delete</button>
+            </form>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            You haven't posted yet.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- My Comments Tab -->
+      <div id="tab-comments" class="tab-panel">
+        <div class="empty-state">
+          Your comments will appear here.
+        </div>
+      </div>
+
+      <!-- My Groups Tab -->
+      <div id="tab-groups" class="tab-panel">
+        <div class="empty-state">
+          Your groups will appear here.
+        </div>
+      </div>
+
+      <!-- Edit Profile Tab -->
+      <div id="tab-edit" class="tab-panel">
+        <div class="profile-card">
+          <h5>Edit Profile</h5>
+          <form method="post" action="{% url 'accounts:profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Display Name</label>
+              <input type="text" class="form-control" name="display_name" value="{{ user.get_full_name|default:user.username }}" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Bio</label>
+              <textarea class="form-control" name="bio" rows="3">{% if user.profile %}{{ user.profile.bio }}{% endif %}</textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Profile Photo</label>
+              <input type="file" name="image" accept="image/*" class="form-control" />
+            </div>
+            <button type="submit" class="profile-btn-primary">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  // Tab switching
+  const tabs = document.querySelectorAll('.profile-tab');
+  const panels = {
+    posts: document.getElementById('tab-posts'),
+    comments: document.getElementById('tab-comments'),
+    groups: document.getElementById('tab-groups'),
+    edit: document.getElementById('tab-edit')
+  };
+  
+  tabs.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tab = this.dataset.tab;
+      
+      // Update tab buttons
+      tabs.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update panels
+      Object.values(panels).forEach(p => {
+        if (p) p.classList.remove('active');
+      });
+      
+      if (panels[tab]) {
+        panels[tab].classList.add('active');
+      }
+    });
+  });
+})();
+
+function toggleProfilePseudonymField() {
+  const anonCheckbox = document.getElementById('anon');
+  const pseudonymGroup = document.getElementById('profilePseudonymGroup');
+  const pseudonymInput = document.getElementById('pseudonym');
+  
+  if (anonCheckbox.checked) {
+    pseudonymGroup.style.display = 'block';
+    if (pseudonymInput) {
+      pseudonymInput.placeholder = 'Enter a name to display (leave blank for "Anonymous")';
+    }
+  } else {
+    pseudonymGroup.style.display = 'none';
+    if (pseudonymInput) {
+      pseudonymInput.value = '';
+    }
+  }
+}
+</script>
+{% endblock %}
